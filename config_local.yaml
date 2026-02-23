@@ -1,0 +1,6 @@
+watch:
+  - .
+exclude:
+  - .git
+log_file: monitor_local.log
+recursive: true

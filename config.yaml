@@ -1,0 +1,20 @@
+# Configuration du moniteur de fichiers
+# Format YAML minimal - compatible avec la bibliothèque standard C
+
+# Chemins à surveiller (depuis la racine /)
+watch:
+  - /
+
+# Chemins à exclure de la surveillance
+exclude:
+  - /proc
+  - /sys
+  - /dev
+  - /run
+  - /tmp
+
+# Fichier de log des événements
+log_file: file_monitor.log
+
+# Surveillance récursive des sous-répertoires
+recursive: true
