@@ -125,9 +125,22 @@ static void process_events(FileMonitor *mon, char *buf, int len) {
         }
 
         /* Ne pas logger les evenements sur le fichier de log (evite boucle feedback) */
-        if (ev->len > 0 && mon->config->log_file[0]) {
-            const char *p = fullpath + strlen(fullpath) - strlen(mon->config->log_file);
-            if (p >= fullpath && strcmp(p, mon->config->log_file) == 0) {
+        if (mon->config->log_file[0]) {
+            const char *log_name = mon->config->log_file;
+            const char *log_base = strrchr(log_name, '/');
+            const char *full_base = strrchr(fullpath, '/');
+
+            if (log_base)
+                log_base++;
+            else
+                log_base = log_name;
+
+            if (full_base)
+                full_base++;
+            else
+                full_base = fullpath;
+
+            if (strcmp(full_base, log_base) == 0) {
                 i += sizeof(struct inotify_event) + ev->len;
                 continue;
             }

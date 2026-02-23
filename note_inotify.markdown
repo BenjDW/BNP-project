@@ -31,12 +31,12 @@ a chaque action (open,close,delete,create...) dans le systeme sa va appel en mem
           close(2)), l'objet sous-jacent et ses ressources sont libérés pour être réutilisés par le noyau ; tous
           les éléments de surveillance associés sont automatiquement libérés.
 
-          struct inotify_event {
-               int      wd;       /* Descripteur de surveillance */
-               uint32_t mask;     /* Masque d'événements */
-               uint32_t cookie;   /* Cookie unique d'association des
-                                     événements (pour rename(2)) */
-               uint32_t len;      /* Taille du champ name */
-               char     name[];   /* Nom optionnel terminé par un nul */
-           };
-           
+         struct inotify_event {
+            int      wd;       /* Descripteur de surveillance */
+            uint32_t mask;     /* Masque d'événements */
+            uint32_t cookie;   /* Cookie unique d'association des
+                                    événements (pour rename(2)) */
+            uint32_t len;      /* Taille du champ name */
+            char     name[];   /* Nom optionnel terminé par un nul */
+         };
+
