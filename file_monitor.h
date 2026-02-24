@@ -3,17 +3,19 @@
 
 #include "config.h"
 #include "logger.h"
+#include "auditd.h"
 
 /*
  * FileMonitor - système de surveillance de fichiers (style objet C)
  * Utilise inotify (API Linux, sys/inotify.h - partie de glibc)
- * Pas de bibliothèques tierces.
+ * Intègre AuditMonitor pour retrouver l'utilisateur à l'origine de l'événement.
  */
 typedef struct FileMonitor FileMonitor;
 
 struct FileMonitor {
     Config *config;
     Logger *logger;
+    AuditMonitor *audit;
     int inotify_fd;
     int running;
 

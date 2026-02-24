@@ -6,7 +6,7 @@ CFLAGS = -Wall -Wextra -O2 -std=c99 -g
 LDFLAGS =
 TARGET = file_monitor
 
-SRCS = main.c config.c logger.c file_monitor.c
+SRCS = main.c config.c logger.c file_monitor.c auditd.c
 OBJS = $(SRCS:.c=.o)
 
 .PHONY: all clean run

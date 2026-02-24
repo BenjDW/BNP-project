@@ -1,3 +1,5 @@
+Auditd n'est pas disponible sur wsl2 car c'est une emulation legere de linux pas comme sur une vm
+
 man : https://manpages.ubuntu.com/manpages/trusty/en/man8/auditd.8.html
 (linux audit deamon)
 auditd est un program qui va trace des events encore plus precisement pas seulement les events mais aussi ceux lié au uid, id, pid

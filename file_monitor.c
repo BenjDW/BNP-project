@@ -1,9 +1,11 @@
 /*
  * FileMonitor - surveillance de fichiers via inotify
  * API Linux inotify (sys/inotify.h) - pas de bibliothèques tierces
- * Log tous les événements de modification/création/suppression
+ * Log tous les événements de modification/création/suppression.
+ * Intègre AuditMonitor pour identifier l'utilisateur à l'origine de l'événement.
  */
 #include "file_monitor.h"
+#include "auditd.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -106,39 +108,41 @@ static const char* event_name(uint32_t mask) {
 static void process_events(FileMonitor *mon, char *buf, int len) {
     struct inotify_event *ev;
     char fullpath[1024];
+    char username[64];
+    char detail[128];
     const char *base;
+    const char *log_name;
+    const char *log_base;
+    const char *full_base;
+    uid_t uid;
     int i = 0;
+
+    /* Vider le socket audit pour récupérer les événements récents */
+    if (mon->audit)
+        mon->audit->process(mon->audit);
 
     while (i < len) {
         ev = (struct inotify_event*)&buf[i];
         base = watch_path_by_wd(ev->wd);
 
-        if (ev->len > 0) {
+        if (ev->len > 0)
             snprintf(fullpath, sizeof(fullpath), "%s/%s", base, ev->name);
-        } else {
+        else
             snprintf(fullpath, sizeof(fullpath), "%s", base);
-        }
 
         if (ev->len > 0 && is_excluded(mon->config, fullpath)) {
             i += sizeof(struct inotify_event) + ev->len;
             continue;
         }
 
-        /* Ne pas logger les evenements sur le fichier de log (evite boucle feedback) */
+        /* Ne pas logger les événements sur le fichier de log (évite boucle feedback) */
         if (mon->config->log_file[0]) {
-            const char *log_name = mon->config->log_file;
-            const char *log_base = strrchr(log_name, '/');
-            const char *full_base = strrchr(fullpath, '/');
+            log_name  = mon->config->log_file;
+            log_base  = strrchr(log_name, '/');
+            full_base = strrchr(fullpath, '/');
 
-            if (log_base)
-                log_base++;
-            else
-                log_base = log_name;
-
-            if (full_base)
-                full_base++;
-            else
-                full_base = fullpath;
+            log_base  = log_base  ? log_base  + 1 : log_name;
+            full_base = full_base ? full_base + 1 : fullpath;
 
             if (strcmp(full_base, log_base) == 0) {
                 i += sizeof(struct inotify_event) + ev->len;
@@ -146,13 +150,28 @@ static void process_events(FileMonitor *mon, char *buf, int len) {
             }
         }
 
-        if (mon->logger && mon->logger->log_event) {
-            mon->logger->log_event(mon->logger, event_name(ev->mask), fullpath,
-                ev->mask & IN_ISDIR ? "(directory)" : NULL);
+        /* Résolution de l'utilisateur via le cache audit */
+        strncpy(username, "unknown", sizeof(username) - 1);
+        username[sizeof(username) - 1] = '\0';
+        if (mon->audit) {
+            uid = mon->audit->get_uid_for_path(mon->audit, fullpath);
+            auditd_uid_to_username(uid, username, sizeof(username));
         }
 
-        /* si récursif et nouveau répertoire créé, l'ajouter */
-        if (mon->config->recursive && (ev->mask & IN_CREATE) && (ev->mask & IN_ISDIR) && ev->len > 0) {
+        /* Construire le champ detail : username [+ (directory)] */
+        if (ev->mask & IN_ISDIR)
+            snprintf(detail, sizeof(detail), "%s (directory)", username);
+        else
+            strncpy(detail, username, sizeof(detail) - 1);
+        detail[sizeof(detail) - 1] = '\0';
+
+        if (mon->logger && mon->logger->log_event)
+            mon->logger->log_event(mon->logger, event_name(ev->mask),
+                                   fullpath, detail);
+
+        /* Si récursif et nouveau répertoire créé, l'ajouter aux watches */
+        if (mon->config->recursive && (ev->mask & IN_CREATE)
+            && (ev->mask & IN_ISDIR) && ev->len > 0) {
             if (!is_excluded(mon->config, fullpath))
                 add_watch_path(mon, fullpath);
         }
@@ -174,7 +193,21 @@ int file_monitor_init_impl(FileMonitor *self, Config *cfg) {
         return -1;
     }
 
-    self->logger->log_event(self->logger, "START", "file_monitor", "Surveillance demarree");
+    /* Initialiser le module audit (non fatal si indisponible) 
+      probleme not available on wls2 because auditd is only on native linux*/
+    // self->audit = auditd_create();
+    // if (self->audit) {
+    //     for (i = 0; i < cfg->watch_count; i++) {
+    //         if (!is_excluded(cfg, cfg->watch_paths[i]))
+    //             auditd_add_watch(cfg->watch_paths[i]);
+    //     }
+    // } else {
+    //     fprintf(stderr, "Warning: audit indisponible"
+    //             " (droits insuffisants ou auditd absent)\n");
+    // }
+
+    self->logger->log_event(self->logger, "START", "file_monitor",
+                            "Surveillance demarree");
 
     g_watch_count = 0;
     for (i = 0; i < cfg->watch_count; i++) {
@@ -212,9 +245,14 @@ void file_monitor_stop_impl(FileMonitor *self) {
 void file_monitor_destroy_impl(FileMonitor *self) {
     if (self) {
         if (self->logger) {
-            self->logger->log_event(self->logger, "STOP", "file_monitor", "Surveillance arretee");
+            self->logger->log_event(self->logger, "STOP", "file_monitor",
+                                    "Surveillance arretee");
             logger_destroy(self->logger);
             self->logger = NULL;
+        }
+        if (self->audit) {
+            auditd_destroy(self->audit);
+            self->audit = NULL;
         }
         if (self->inotify_fd >= 0) {
             close(self->inotify_fd);
@@ -228,6 +266,7 @@ FileMonitor* file_monitor_create(void) {
     if (!m) return NULL;
     memset(m, 0, sizeof(FileMonitor));
     m->inotify_fd = -1;
+    m->audit = NULL;
     m->init = file_monitor_init_impl;
     m->run = file_monitor_run_impl;
     m->stop = file_monitor_stop_impl;
