@@ -11,11 +11,14 @@ auditd est un program qui va trace des events encore plus precisement pas seulem
 
     -s=ENABLE_STATE
 
-creé une regle pour surveille les execve de user ciblé :
+creé une regle pour surveille les "execve" de user ciblé :
 sudo auditctl -a always,exit -F arch=b64 -S execve -F auid=1000 -k bde_exec
 
 auditctl [options]
 The  auditctl  program  is used to control the behavior, get status, and add or delete rules into the 2.6 kernel's audit system.
+
+ausearch [options]
+ausearch  is  a  tool  that  can  query  the audit daemon logs based for events based on different search criteria.
 
 
 id : bde-wits
@@ -25,7 +28,7 @@ uid=1000(bde-wits) gid=1000(bde-wits) groups=1000(bde-wits),
 difference entre les outils sur ubuntu / mac :
 
 Ubuntu	     /      macOS
-auditd       =      OpenBSM
+auditd       =      OpenBSM (Endpoint Security Framework, API Apple)
 auditctl	 =      audit -s
 ausearch	 =      praudit
 
