@@ -1,0 +1,86 @@
+# Makefile.gnustep — GNUstep build (Ubuntu + GCC + gnustep-config)
+#
+# Prerequisites:
+#   sudo apt install gnustep-devel gobjc libobjc-dev
+#   (libft must already be built: cd ../42/libft && make)
+#
+# Usage:
+#   make -f Makefile.gnustep          # build file_monitor_objc
+#   make -f Makefile.gnustep clean
+#   make -f Makefile.gnustep run
+#
+# The resulting binary is identical in behaviour to 'file_monitor' (pure C),
+# but the ObjC wrapper classes are compiled in alongside the C modules.
+# The entry point (main.c) is compiled unchanged — it calls the C API directly.
+# You can gradually migrate main.c to use the ObjC classes if desired.
+
+CC      = gcc
+OBJDIR  = build
+TARGET  = $(OBJDIR)/file_monitor_objc
+
+# GNUstep provides the base ObjC flags; we also need the GCC ObjC headers
+# (where objc/objc.h actually lives on Ubuntu).
+OBJC_FLAGS  := $(shell gnustep-config --objc-flags) -I/usr/lib/gcc/x86_64-linux-gnu/13/include
+OBJC_LIBS   := $(shell gnustep-config --base-libs)
+
+# C flags (mirror the original Makefile)
+CFLAGS  = -Wall -Wextra -O2 -std=c99 -g -Iinclude
+
+# Combined flags for .m compilation
+# Use a modern C standard so declarations in for-loops are accepted.
+MFLAGS  = $(OBJC_FLAGS) -Wall -Wextra -O2 -g -std=gnu11 -Iinclude
+
+# ---- Source files -------------------------------------------------------
+
+# Original C modules — compiled exactly as in the pure-C build.
+C_SRCS  = main.c \
+           config.c \
+           logger.c \
+           file_monitor.c \
+           auditd.c
+
+# New Objective-C wrapper classes (Option A — parallel wrappers).
+M_SRCS  = ConfigObj.m \
+           LoggerObj.m \
+           AuditMonitorObj.m \
+           FileMonitorObj.m
+
+# Objects and dependency files live under $(OBJDIR)
+C_OBJS  = $(addprefix $(OBJDIR)/,$(C_SRCS:.c=.objc.o))
+M_OBJS  = $(addprefix $(OBJDIR)/,$(M_SRCS:.m=.o))
+
+# ---- Rules --------------------------------------------------------------
+
+.PHONY: all clean run
+
+all: $(TARGET)
+
+# Link: C objects + ObjC objects + libft + GNUstep Foundation
+$(TARGET): $(C_OBJS) $(M_OBJS)
+	$(CC) -o $@ $^ ../42/libft/libft.a $(OBJC_LIBS)
+
+# Compile C sources (use a distinct .objc.o suffix to avoid collisions with
+# the pure-C Makefile objects that use plain .o).
+$(OBJDIR)/%.objc.o: %.c
+	mkdir -p $(OBJDIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+# Compile Objective-C sources
+$(OBJDIR)/%.o: %.m
+	mkdir -p $(OBJDIR)
+	$(CC) $(MFLAGS) -c -o $@ $<
+
+clean:
+	rm -rf $(OBJDIR) $(TARGET)
+
+run: $(TARGET)
+	./$(TARGET)
+
+# ---- Convenience: show compile commands ---------------------------------
+# Useful for IDE integration or debugging build issues.
+.PHONY: show-flags
+show-flags:
+	@echo "OBJC_FLAGS : $(OBJC_FLAGS)"
+	@echo "OBJC_LIBS  : $(OBJC_LIBS)"
+	@echo "C_SRCS     : $(C_SRCS)"
+	@echo "M_SRCS     : $(M_SRCS)"

@@ -40,3 +40,24 @@ a chaque action (open,close,delete,create...) dans le systeme sa va appel en mem
             char     name[];   /* Nom optionnel terminé par un nul */
          };
 
+Le c object ressemble réelement a un hybride entre le cpp et c
+
+delacration (Classe = interface)
+@interface Greeter : NSObject
+- (void)say:(NSString*)msg;
+@end
+
+Greeter hérite de NSObject
+- = méthode d’instance (il faut un objet)
++ = méthode de classe (comme un “static” côté concept)
+
+Déclaration de la méthode :
+@implementation Greeter
+- (void)say:(NSString*)msg { ... }
+@end
+
+debug launch c obj:
+make -f Makefile.gnustep
+./file_monitor_objc
+
+et gdb

@@ -2,12 +2,13 @@
 # Pas de bibliothèques tierces
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -O2 -std=c99 -g
+CFLAGS = -Wall -Wextra -Werror -O2 -std=c99 -g -Iinclude
 LDFLAGS =
 TARGET = file_monitor
+OBJDIR = build
 
 SRCS = main.c config.c logger.c file_monitor.c auditd.c
-OBJS = $(SRCS:.c=.o)
+OBJS = $(addprefix $(OBJDIR)/,$(SRCS:.c=.o))
 
 .PHONY: all clean run
 
@@ -16,11 +17,12 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $^ ../42/libft/libft.a
 
-%.o: %.c
+$(OBJDIR)/%.o: %.c
+	mkdir -p $(OBJDIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -rf $(OBJDIR) $(TARGET)
 
 run: $(TARGET)
 	./$(TARGET)

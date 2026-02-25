@@ -17,10 +17,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "config.h"
-#include "file_monitor.h"
+#include "include/config.h"
+#include "include/file_monitor.h"
 
-#define PIDFILE "file_monitor.pid"
+#define PIDFILE "build/file_monitor.pid"
 
 /* Prototype explicite pour kill() (POSIX) afin d'eviter les warnings
  * d'implicit declaration avec certains niveaux de standard C. */
@@ -37,6 +37,9 @@ static void signal_handler(int sig) {
 
 static int write_pidfile(const char *path)
 {
+    /* Ensure directory for pidfile exists (best-effort). */
+    mkdir("build", 0755);
+
     FILE *f = fopen(path, "w");
     if (!f)
         return -1;
