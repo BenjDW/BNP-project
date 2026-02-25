@@ -31,14 +31,14 @@ recursive: true
 ## Compilation
 
 ```bash
-make
+make or make -f Makefile.gnustep (obj C)
 ```
 
 ## Utilisation
 
 ```bash
 # Avec config.yaml par défaut
-./file_monitor
+./file_monitor or ./file_monitor_objc
 
 # Avec un fichier de config spécifique
 ./file_monitor config.yaml

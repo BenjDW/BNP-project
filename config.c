@@ -2,7 +2,7 @@
  * Parser YAML minimal - bibliothèque standard uniquement
  * Supporte: watch, exclude, log_file, recursive
  */
-#include "config.h"
+#include "include/config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

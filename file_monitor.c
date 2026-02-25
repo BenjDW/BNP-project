@@ -4,8 +4,8 @@
  * Log tous les événements de modification/création/suppression.
  * Intègre AuditMonitor pour identifier l'utilisateur à l'origine de l'événement.
  */
-#include "file_monitor.h"
-#include "auditd.h"
+#include "include/file_monitor.h"
+#include "include/auditd.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

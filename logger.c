@@ -2,7 +2,7 @@
  * Logger - écriture des événements dans un fichier txt
  * Bibliothèque standard uniquement
  */
-#include "logger.h"
+#include "include/logger.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

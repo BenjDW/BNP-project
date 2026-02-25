@@ -14,7 +14,7 @@
  * auditd_add_watch() appelle auditctl pour installer la règle de surveillance.
  * auditd_uid_to_username() utilise getpwuid_r() (bibliothèque standard).
  */
-#include "auditd.h"
+#include "include/auditd.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
