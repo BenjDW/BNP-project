@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "../42/libft/libft.h"
 
 static void log_event_impl(Logger *self, const char *event_type, const char *path, const char *detail) {
     time_t now = time(NULL);
@@ -32,7 +33,7 @@ Logger* logger_create(const char *log_path) {
     if (!log) return NULL;
 
     memset(log, 0, sizeof(Logger));
-    strncpy(log->path, log_path, sizeof(log->path) - 1);
+    ft_strlcpy(log->path, log_path, sizeof(log->path));
 
     log->fp = fopen(log_path, "a");
     if (!log->fp) {

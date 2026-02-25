@@ -2,7 +2,7 @@
 # Pas de bibliothèques tierces
 
 CC = gcc
-CFLAGS = -Wall -Wextra -O2 -std=c99 -g
+CFLAGS = -Wall -Wextra -Werror -O2 -std=c99 -g
 LDFLAGS =
 TARGET = file_monitor
 
@@ -14,7 +14,7 @@ OBJS = $(SRCS:.c=.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^ ../42/libft/libft.a
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

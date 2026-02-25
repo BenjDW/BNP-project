@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include "../42/libft/libft.h"
 
 /* inotify - API Linux standard (glibc) */
 #include <sys/inotify.h>
@@ -70,7 +71,7 @@ static int add_watch_path(FileMonitor *mon, const char *path) {
     if (wd < 0) return -1;
 
     g_watches[g_watch_count].wd = wd;
-    strncpy(g_watches[g_watch_count].path, path, sizeof(g_watches[g_watch_count].path) - 1);
+    ft_strlcpy(g_watches[g_watch_count].path, path, sizeof(g_watches[g_watch_count].path));
     g_watch_count++;
     return 0;
 }
@@ -151,8 +152,7 @@ static void process_events(FileMonitor *mon, char *buf, int len) {
         }
 
         /* Résolution de l'utilisateur via le cache audit */
-        strncpy(username, "unknown", sizeof(username) - 1);
-        username[sizeof(username) - 1] = '\0';
+        ft_strlcpy(username, "unknown", sizeof(username));
         if (mon->audit) {
             uid = mon->audit->get_uid_for_path(mon->audit, fullpath);
             auditd_uid_to_username(uid, username, sizeof(username));
@@ -162,8 +162,7 @@ static void process_events(FileMonitor *mon, char *buf, int len) {
         if (ev->mask & IN_ISDIR)
             snprintf(detail, sizeof(detail), "%s (directory)", username);
         else
-            strncpy(detail, username, sizeof(detail) - 1);
-        detail[sizeof(detail) - 1] = '\0';
+            ft_strlcpy(detail, username, sizeof(detail));
 
         if (mon->logger && mon->logger->log_event)
             mon->logger->log_event(mon->logger, event_name(ev->mask),

@@ -8,6 +8,7 @@
 #include <string.h>
 #include <strings.h>
 #include <ctype.h>
+#include "../42/libft/libft.h"
 
 #define MAX_LINE 512
 
@@ -28,7 +29,7 @@ static void trim(char *s) {
 void config_init(Config *cfg) {
     memset(cfg, 0, sizeof(Config));
     cfg->recursive = 1;
-    strncpy(cfg->log_file, "file_monitor.log", MAX_LOG_PATH - 1);
+    ft_strlcpy(cfg->log_file, "file_monitor.log", MAX_LOG_PATH);
 }
 
 int config_parse(const char *path, Config *cfg) {
@@ -48,22 +49,19 @@ int config_parse(const char *path, Config *cfg) {
         if (!line[0] || line[0] == '#')
             continue;
         if (line[0] == '-' && in_watch) {
-            strncpy(value, line + 1, sizeof(value) - 1);
-            value[sizeof(value) - 1] = '\0';
+            ft_strlcpy(value, line + 1, sizeof(value));
             trim(value);
             if (cfg->watch_count < MAX_PATHS && strlen(value) > 0) {
-                strncpy(cfg->watch_paths[cfg->watch_count], value, MAX_PATH_LEN - 1);
-                cfg->watch_paths[cfg->watch_count][MAX_PATH_LEN - 1] = '\0';
+                ft_strlcpy(cfg->watch_paths[cfg->watch_count], value, MAX_PATH_LEN);
                 cfg->watch_count++;
             }
             continue;
         }
         if (line[0] == '-' && in_exclude) {
-            strncpy(value, line + 1, sizeof(value) - 1);
+            ft_strlcpy(value, line + 1, sizeof(value));
             trim(value);
             if (cfg->exclude_count < MAX_PATHS && strlen(value) > 0) {
-                strncpy(cfg->exclude_paths[cfg->exclude_count], value, MAX_PATH_LEN - 1);
-                cfg->exclude_paths[cfg->exclude_count][MAX_PATH_LEN - 1] = '\0';
+                ft_strlcpy(cfg->exclude_paths[cfg->exclude_count], value, MAX_PATH_LEN);
                 cfg->exclude_count++;
             }
             continue;
@@ -84,22 +82,19 @@ int config_parse(const char *path, Config *cfg) {
         if (strcmp(key, "watch") == 0) {
             in_watch = 1;
             if (strlen(value) > 0 && cfg->watch_count < MAX_PATHS) {
-                strncpy(cfg->watch_paths[cfg->watch_count], value, MAX_PATH_LEN - 1);
-                cfg->watch_paths[cfg->watch_count][MAX_PATH_LEN - 1] = '\0';
+                ft_strlcpy(cfg->watch_paths[cfg->watch_count], value, MAX_PATH_LEN);
                 cfg->watch_count++;
             }
         } else if (strcmp(key, "exclude") == 0) {
             in_exclude = 1;
             if (strlen(value) > 0 && cfg->exclude_count < MAX_PATHS) {
-                strncpy(cfg->exclude_paths[cfg->exclude_count], value, MAX_PATH_LEN - 1);
-                cfg->exclude_paths[cfg->exclude_count][MAX_PATH_LEN - 1] = '\0';
+                ft_strlcpy(cfg->exclude_paths[cfg->exclude_count], value, MAX_PATH_LEN);
                 cfg->exclude_count++;
             }
         } else if (strcmp(key, "log_file") == 0) {
             if (strlen(value) > 0)
             {
-                strncpy(cfg->log_file, value, MAX_LOG_PATH - 1);
-                cfg->log_file[MAX_LOG_PATH - 1] = '\0';
+                ft_strlcpy(cfg->log_file, value, MAX_LOG_PATH);
             }
         } else if (strcmp(key, "recursive") == 0) {
             cfg->recursive = (strcasecmp(value, "true") == 0 || strcasecmp(value, "yes") == 0 || value[0] == '1');
@@ -110,8 +105,7 @@ int config_parse(const char *path, Config *cfg) {
 
     /* Si aucun watch, utiliser / par défaut */
     if (cfg->watch_count == 0) {
-        strncpy(cfg->watch_paths[0], "/", MAX_PATH_LEN - 1);
-        cfg->watch_paths[0][MAX_PATH_LEN - 1] = '\0';
+        ft_strlcpy(cfg->watch_paths[0], "/", MAX_PATH_LEN);
         cfg->watch_count = 1;
     }
 

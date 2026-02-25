@@ -25,6 +25,7 @@
 #include <linux/netlink.h>
 #include <linux/audit.h>
 #include <pwd.h>
+#include "../42/libft/libft.h"
 
 /* --------------------------------------------------------------------------
  * Helpers: parsing des enregistrements texte audit
@@ -148,7 +149,7 @@ static void parse_audit_record(AuditMonitor *self,
         pe = get_or_alloc_pending(self, serial);
         /* Conserver seulement le premier chemin du groupe (item=0) */
         if (!pe->has_path) {
-            strncpy(pe->path, val, sizeof(pe->path) - 1);
+            ft_strlcpy(pe->path, val, sizeof(pe->path));
             pe->has_path = 1;
         }
 
@@ -159,7 +160,7 @@ static void parse_audit_record(AuditMonitor *self,
 
         if (pe->has_uid && pe->has_path) {
             entry = &self->cache[self->cache_idx % AUDIT_CACHE_SIZE];
-            strncpy(entry->path, pe->path, sizeof(entry->path) - 1);
+            ft_strlcpy(entry->path, pe->path, sizeof(entry->path));
             entry->uid = pe->uid;
             self->cache_idx++;
         }
@@ -252,14 +253,12 @@ int auditd_uid_to_username(uid_t uid, char *buf, size_t buflen)
     char tmp[1024];
 
     if (uid == (uid_t)-1 || uid == (uid_t)4294967295U) {
-        strncpy(buf, "unknown", buflen - 1);
-        buf[buflen - 1] = '\0';
+        ft_strlcpy(buf, "unknown", buflen);
         return -1;
     }
 
     if (getpwuid_r(uid, &pw, tmp, sizeof(tmp), &result) == 0 && result) {
-        strncpy(buf, result->pw_name, buflen - 1);
-        buf[buflen - 1] = '\0';
+        ft_strlcpy(buf, result->pw_name, buflen);
         return 0;
     }
 
