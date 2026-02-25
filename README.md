@@ -55,6 +55,18 @@ make test-local
 - `Logger` – log des événements dans un fichier txt
 - `FileMonitor` – moniteur inotify avec méthodes init/run/stop/destroy
 
+## Architecture
+
+```mermaid
+flowchart TB
+    A[config.yaml] --> B[Config parse]
+    B --> C[FileMonitor init]
+    C --> D[inotify watches + exclusions]
+    D --> E[run loop: read inotify]
+    E --> F[event: path + optional AuditMonitor → user]
+    F --> G[Logger → .txt log]
+```
+
 ## Format du log
 
 ```
