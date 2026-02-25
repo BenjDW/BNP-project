@@ -16,7 +16,7 @@
 
 CC      = gcc
 OBJDIR  = build
-TARGET  = $(OBJDIR)/file_monitor_objc
+TARGET  = file_monitor_objc
 
 # GNUstep provides the base ObjC flags; we also need the GCC ObjC headers
 # (where objc/objc.h actually lives on Ubuntu).
