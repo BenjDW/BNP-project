@@ -2,7 +2,6 @@
 #
 # Prerequisites:
 #   sudo apt install gnustep-devel gobjc libobjc-dev
-#   (libft must already be built: cd ../42/libft && make)
 #
 # Usage:
 #   make -f Makefile.gnustep          # build file_monitor_objc
@@ -37,7 +36,8 @@ C_SRCS  = main.c \
            config.c \
            logger.c \
            file_monitor.c \
-           auditd.c
+           auditd.c \
+           util.c
 
 # New Objective-C wrapper classes (Option A — parallel wrappers).
 M_SRCS  = ConfigObj.m \
@@ -55,9 +55,9 @@ M_OBJS  = $(addprefix $(OBJDIR)/,$(M_SRCS:.m=.o))
 
 all: $(TARGET)
 
-# Link: C objects + ObjC objects + libft + GNUstep Foundation
+# Link: C objects + ObjC objects + GNUstep Foundation
 $(TARGET): $(C_OBJS) $(M_OBJS)
-	$(CC) -o $@ $^ ../42/libft/libft.a $(OBJC_LIBS)
+	$(CC) -o $@ $^ $(OBJC_LIBS)
 
 # Compile C sources (use a distinct .objc.o suffix to avoid collisions with
 # the pure-C Makefile objects that use plain .o).

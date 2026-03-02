@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "../42/libft/libft.h"
+#include "include/util.h"
 
 static void log_event_impl(Logger *self, const char *event_type, const char *path, const char *detail) {
     time_t now = time(NULL);

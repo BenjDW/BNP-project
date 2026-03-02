@@ -13,7 +13,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include "../42/libft/libft.h"
+#include "include/util.h"
 
 /* inotify - API Linux standard (glibc) */
 #include <sys/inotify.h>

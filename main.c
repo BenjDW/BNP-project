@@ -19,11 +19,11 @@
 #include <pwd.h>
 #include <ctype.h>
 #include <errno.h>
-#include "../42/libft/libft.h"
 
 #include "include/config.h"
 #include "include/file_monitor.h"
 #include "include/auditd.h"
+#include "include/util.h"
 
 #define PIDFILE "build/file_monitor.pid"
 

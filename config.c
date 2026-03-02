@@ -8,7 +8,7 @@
 #include <string.h>
 #include <strings.h>
 #include <ctype.h>
-#include "../42/libft/libft.h"
+#include "include/util.h"
 
 #define MAX_LINE 512
 

@@ -7,7 +7,7 @@ LDFLAGS =
 TARGET = file_monitor
 OBJDIR = build
 
-SRCS = main.c config.c logger.c file_monitor.c auditd.c
+SRCS = main.c config.c logger.c file_monitor.c auditd.c util.c
 OBJS = $(addprefix $(OBJDIR)/,$(SRCS:.c=.o))
 
 .PHONY: all clean run
@@ -15,7 +15,7 @@ OBJS = $(addprefix $(OBJDIR)/,$(SRCS:.c=.o))
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $^ ../42/libft/libft.a
+	$(CC) $(LDFLAGS) -o $@ $^
 
 $(OBJDIR)/%.o: %.c
 	mkdir -p $(OBJDIR)

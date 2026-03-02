@@ -25,7 +25,7 @@
 #include <linux/netlink.h>
 #include <linux/audit.h>
 #include <pwd.h>
-#include "../42/libft/libft.h"
+#include "include/util.h"
 
 /* --------------------------------------------------------------------------
  * Helpers: parsing des enregistrements texte audit
