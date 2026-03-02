@@ -50,6 +50,9 @@ void auditd_destroy(AuditMonitor *am);
 /* Ajoute une règle de surveillance auditd pour 'path' (fork+exec auditctl) */
 int auditd_add_watch(const char *path);
 
+/* Supprime une règle de surveillance auditd pour 'path' (fork+exec auditctl) */
+int auditd_remove_watch(const char *path);
+
 /* Convertit un uid en nom d'utilisateur via getpwuid_r()
  * Retourne 0 si trouvé, -1 sinon (buf contient "uid:NNN" ou "unknown") */
 int auditd_uid_to_username(uid_t uid, char *buf, size_t buflen);

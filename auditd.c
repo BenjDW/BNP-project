@@ -293,6 +293,30 @@ int auditd_add_watch(const char *path)
     return (WIFEXITED(status) && WEXITSTATUS(status) == 0) ? 0 : -1;
 }
 
+int auditd_remove_watch(const char *path)
+{
+    pid_t pid;
+    int status;
+    char *argv[7];
+
+    /* auditctl -W <path> -k file_monitor */
+    argv[0] = "auditctl";
+    argv[1] = "-W";
+    argv[2] = (char *)path;
+    argv[3] = "-k";
+    argv[4] = "file_monitor";
+    argv[5] = NULL;
+
+    pid = fork();
+    if (pid < 0) return -1;
+    if (pid == 0) {
+        execvp("auditctl", argv);
+        _exit(127);
+    }
+    waitpid(pid, &status, 0);
+    return (WIFEXITED(status) && WEXITSTATUS(status) == 0) ? 0 : -1;
+}
+
 AuditMonitor *auditd_create(void)
 {
     AuditMonitor *am;
